@@ -36,17 +36,62 @@ public class CustomAndroidFormatStrategy implements MediaFormatStrategy {
         this.width = width;
         this.height = height;
     }
+//older logic wasn't working. commenting - rkd
+//     public MediaFormat createVideoOutputFormat(MediaFormat inputFormat) {
+//         int inWidth = inputFormat.getInteger(MediaFormat.KEY_WIDTH);
+//         int inHeight = inputFormat.getInteger(MediaFormat.KEY_HEIGHT);
+//         int inLonger, inShorter, outWidth, outHeight, outLonger;
+//         double aspectRatio;
 
-    public MediaFormat createVideoOutputFormat(MediaFormat inputFormat) {
+//         if (this.width >= this.height) {
+//             outLonger = this.width;
+//         } else {
+//             outLonger = this.height;
+//         }
+
+//         if (inWidth >= inHeight) {
+//             inLonger = inWidth;
+//             inShorter = inHeight;
+
+//         } else {
+//             inLonger = inHeight;
+//             inShorter = inWidth;
+
+//         }
+
+//         if (inLonger > outLonger && outLonger > 0) {
+//             if (inWidth >= inHeight) {
+//                 aspectRatio = (double) inLonger / (double) inShorter;
+//                 outWidth = outLonger;
+//                 outHeight = Double.valueOf(outWidth / aspectRatio).intValue();
+
+//             } else {
+//                 aspectRatio = (double) inLonger / (double) inShorter;
+//                 outHeight = outLonger;
+//                 outWidth = Double.valueOf(outHeight / aspectRatio).intValue();
+//             }
+//         } else {
+//             outWidth = inWidth;
+//             outHeight = inHeight;
+//         }
+    
+        public MediaFormat createVideoOutputFormat(MediaFormat inputFormat) {
         int inWidth = inputFormat.getInteger(MediaFormat.KEY_WIDTH);
         int inHeight = inputFormat.getInteger(MediaFormat.KEY_HEIGHT);
-        int inLonger, inShorter, outWidth, outHeight, outLonger;
+        int inLonger, inShorter, outWidth, outHeight, outLonger,outShorter;
         double aspectRatio;
-
-        if (this.width >= this.height) {
-            outLonger = this.width;
+        //check for shoter side instead of longer
+        // if (this.width >= this.height) {
+        //     outLonger = this.width;
+        // } else {
+        //     outLonger = this.height;
+        // }
+            
+        //changed code to compare shorter side of input to output
+         if (this.width >= this.height) {
+            outShorter = this.height;
         } else {
-            outLonger = this.height;
+            outShorter = this.width;
         }
 
         if (inWidth >= inHeight) {
@@ -59,21 +104,35 @@ public class CustomAndroidFormatStrategy implements MediaFormatStrategy {
 
         }
 
-        if (inLonger > outLonger && outLonger > 0) {
-            if (inWidth >= inHeight) {
-                aspectRatio = (double) inLonger / (double) inShorter;
-                outWidth = outLonger;
-                outHeight = Double.valueOf(outWidth / aspectRatio).intValue();
 
-            } else {
-                aspectRatio = (double) inLonger / (double) inShorter;
-                outHeight = outLonger;
-                outWidth = Double.valueOf(outHeight / aspectRatio).intValue();
-            }
-        } else {
+       // if (inLonger > outLonger && outLonger > 0) {
+        // if (inShorter > outShorter && outShorter > 0 ) {
+        //     if (inWidth <= inHeight) {
+        //         aspectRatio = (double) inLonger / (double) inShorter;
+        //         outWidth = outShorter;
+        //         outHeight = Double.valueOf(outWidth / aspectRatio).intValue();
+
+        //     } else {
+        //         aspectRatio = (double) inLonger / (double) inShorter;
+        //         outHeight = outShorter;
+        //         outWidth = Double.valueOf(outHeight / aspectRatio).intValue();
+        //     }
+        // } else {
+        //     outWidth = inWidth/2;
+        //     outHeight = inHeight/2;
+        // }
+        //simplified logic since original was not working. check if shorter side > 500 and scale by 2 if so
+        if(inShorter > 500)
+        {
+             outWidth = inWidth/2;
+             outHeight = inHeight/2;
+        }
+        else
+        {
             outWidth = inWidth;
             outHeight = inHeight;
         }
+
 
         MediaFormat format = MediaFormat.createVideoFormat("video/avc", outWidth, outHeight);
         format.setInteger(MediaFormat.KEY_BIT_RATE, mBitRate);
